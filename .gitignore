@@ -1,0 +1,8 @@
+node_modules
+package-lock.json
+./profile
+.env
+src/files/**.*
+profile
+dist
+src/whatsappToSend.json
