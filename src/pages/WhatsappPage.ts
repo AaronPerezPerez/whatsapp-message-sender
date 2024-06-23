@@ -16,7 +16,6 @@ export class WhatsappPage {
     const contactSearchSelector = await this.page.$(
       'div[aria-label="Cuadro de texto para ingresar la búsqueda"]',
     );
-
     return !Boolean(qrSelector) && Boolean(contactSearchSelector);
   }
 

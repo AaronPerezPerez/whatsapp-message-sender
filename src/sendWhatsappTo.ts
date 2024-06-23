@@ -34,12 +34,15 @@ const main = async () => {
   const browser = await createBrowser();
   const page = await browser.newPage();
   const whatsappPage = new WhatsappPage(page);
+  await page.setUserAgent(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3641.0 Safari/537.36",
+  );
 
   await page.goto("https://web.whatsapp.com/");
-  await page.setViewport({ width: 1080, height: 1024 });
 
   await sleep(config.OPEN_WHATSAPP_WAIT);
 
+  await page.screenshot({ path: "screenshot.png", fullPage: true });
   if (!(await whatsappPage.isLoggedIn())) throw new NotLoggedInError();
 
   await whatsappPage.goToChat(whatsappToSend.to);

@@ -6,3 +6,5 @@ src/files/**.*
 profile
 dist
 src/whatsappToSend.json
+screenshoot.*
+.idea
