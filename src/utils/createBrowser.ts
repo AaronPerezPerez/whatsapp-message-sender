@@ -12,8 +12,8 @@ export const createBrowser = async () => {
 
   return await puppeteer.launch({
     headless: config.HEADLESS,
+    defaultViewport: null,
     userDataDir: "./profile",
-    args: ["--lang=es-ES,es"],
-    // executablePath: config.BROWSER_PATH,
+    args: ["--lang=es-ES,es", "--start-maximized"],
   });
 };
