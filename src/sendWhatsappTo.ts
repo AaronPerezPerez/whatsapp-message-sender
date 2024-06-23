@@ -38,7 +38,7 @@ const main = async () => {
   await page.goto("https://web.whatsapp.com/");
   await page.setViewport({ width: 1080, height: 1024 });
 
-  await sleep(config.LONG_WAIT);
+  await sleep(config.OPEN_WHATSAPP_WAIT);
 
   if (!(await whatsappPage.isLoggedIn())) throw new NotLoggedInError();
 

@@ -26,7 +26,7 @@ export class WhatsappPage {
       .catch(() => {
         throw new ContactNotFound();
       });
-    await sleep(config.SHORT_WAIT);
+    await sleep(config.SEND_WHATSAPP_WAIT);
     await this.page.keyboard.press("Enter");
     await sleep(config.MEDIUM_WAIT);
   }
@@ -36,7 +36,7 @@ export class WhatsappPage {
       'div[aria-label="Cuadro de texto para ingresar la búsqueda"]',
       contactNumber,
     );
-    await sleep(config.SHORT_WAIT);
+    await sleep(config.FIND_CONTACT_WAIT);
     await this.page.mouse.click(250, 250);
   }
 
