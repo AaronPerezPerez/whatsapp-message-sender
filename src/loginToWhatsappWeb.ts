@@ -1,11 +1,10 @@
-import puppeteer from "puppeteer-core";
 import { sleep } from "./utils/sleep.js";
-import { UnreachableWhatsappMainPage } from "./errors/UnreachableWhatsappMainPage.js";
 import { AlreadyLoggedInError } from "./errors/AlreadyLoggedInError.js";
 import { WhatsappPage } from "./pages/WhatsappPage.js";
 import dotenv from "dotenv";
 import { config } from "./utils/config.js";
 import { createBrowser } from "./utils/createBrowser.js";
+import { ResponseWriter } from "./types/ResponseWriter.js";
 
 const main = async () => {
   dotenv.config();
@@ -28,9 +27,11 @@ const main = async () => {
 main()
   .then(() => {
     console.log("Done!");
+    ResponseWriter.write();
     process.exit(0);
   })
   .catch((error) => {
     console.error(error);
+    ResponseWriter.write(error);
     process.exit(1);
   });

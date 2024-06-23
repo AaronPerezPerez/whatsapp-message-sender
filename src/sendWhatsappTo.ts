@@ -1,10 +1,8 @@
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import dotenv from "dotenv";
 import { readFile } from "fs/promises";
 import path from "node:path";
 import { sleep } from "./utils/sleep.js";
-import { UnreachableWhatsappMainPage } from "./errors/UnreachableWhatsappMainPage.js";
 import { CouldNotParseWhatsappToSendError } from "./errors/CouldNotParseWhatsappToSendError.js";
 import { WhatsappPage } from "./pages/WhatsappPage.js";
 import {
@@ -14,6 +12,7 @@ import {
 import { NotLoggedInError } from "./errors/NotLoggedInError.js";
 import { config } from "./utils/config.js";
 import { createBrowser } from "./utils/createBrowser.js";
+import { ResponseWriter } from "./types/ResponseWriter.js";
 
 const retrieveWhatsappToSend = async (): Promise<WhatsappToSend> => {
   const __filename = fileURLToPath(import.meta.url);
@@ -51,9 +50,11 @@ const main = async () => {
 main()
   .then(() => {
     console.log("Done!");
+    ResponseWriter.write();
     process.exit(0);
   })
   .catch((error) => {
     console.error(error);
+    ResponseWriter.write(error);
     process.exit(1);
   });

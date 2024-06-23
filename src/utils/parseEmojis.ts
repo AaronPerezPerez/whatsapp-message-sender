@@ -7,7 +7,7 @@ export const codeToEmoji = {
 };
 export const parseEmojis = (text: string): string => {
   for (const [code, emoji] of Object.entries(codeToEmoji)) {
-    text = text.replace(code, emoji);
+    text = text.replaceAll(code, emoji);
   }
   return text;
 };
