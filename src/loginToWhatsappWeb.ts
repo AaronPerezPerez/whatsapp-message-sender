@@ -17,7 +17,7 @@ const main = async () => {
   );
   await sleep(config.OPEN_WHATSAPP_WAIT);
 
-  if (await whatsappPage.isLoggedIn()) throw new AlreadyLoggedInError();
+  if (await whatsappPage.isLoggedIn()) throw new AlreadyLoggedInError("");
 
   await whatsappPage.waitForLogIn(60_000);
   await sleep(config.LONG_WAIT);
@@ -32,6 +32,6 @@ main()
   })
   .catch((error) => {
     console.error(error);
-    ResponseWriter.write(error);
+    ResponseWriter.write([error]);
     process.exit(1);
   });

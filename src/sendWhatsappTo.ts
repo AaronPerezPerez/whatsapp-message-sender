@@ -13,8 +13,10 @@ import { NotLoggedInError } from "./errors/NotLoggedInError.js";
 import { config } from "./utils/config.js";
 import { createBrowser } from "./utils/createBrowser.js";
 import { ResponseWriter } from "./types/ResponseWriter.js";
+import { DomainError } from "./errors/DomainError.js";
+import { WhatsappSentSuccessfullyError } from "./errors/WhatsappSentSuccessfullyError.js";
 
-const retrieveWhatsappToSend = async (): Promise<WhatsappToSend> => {
+const retrieveWhatsappToSend = async (): Promise<WhatsappToSend[]> => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
   const raw = await readFile(path.join(__dirname, "whatsappToSend.json"), {
@@ -22,14 +24,16 @@ const retrieveWhatsappToSend = async (): Promise<WhatsappToSend> => {
   }).catch(() => "");
 
   try {
-    const json: WhatsappToSendPrimitives = JSON.parse(raw);
-    return WhatsappToSend.fromPrimitives(json);
+    const json: WhatsappToSendPrimitives[] = JSON.parse(raw);
+    return json.map(WhatsappToSend.fromPrimitives);
   } catch (e) {
-    throw new CouldNotParseWhatsappToSendError();
+    throw new CouldNotParseWhatsappToSendError("");
   }
 };
+
+//TODO: This is terrible, fix this as soon as possible (use Either-like monad??)
 const main = async () => {
-  const whatsappToSend = await retrieveWhatsappToSend();
+  const whatsappsToSend = await retrieveWhatsappToSend();
   const browser = await createBrowser();
   const page = await browser.newPage();
   const whatsappPage = new WhatsappPage(page);
@@ -40,21 +44,25 @@ const main = async () => {
   await page.goto("https://web.whatsapp.com/");
 
   await sleep(config.OPEN_WHATSAPP_WAIT);
+  const errors: DomainError[] = [];
+  for (const whatsappToSend of whatsappsToSend) {
+    try {
+      if (!(await whatsappPage.isLoggedIn()))
+        throw new NotLoggedInError(whatsappToSend.id);
 
-  await page.screenshot({ path: "screenshot.png", fullPage: true });
-  if (!(await whatsappPage.isLoggedIn())) throw new NotLoggedInError();
+      await whatsappPage.goToChat(whatsappToSend.to);
+      await whatsappPage.sendMessage(whatsappToSend);
 
-  await whatsappPage.goToChat(whatsappToSend.to);
-  await whatsappPage.sendMessage(whatsappToSend.message);
+      throw new WhatsappSentSuccessfullyError(whatsappToSend.id);
+    } catch (e) {
+      errors.push(e as DomainError);
+    }
+  }
+
+  return errors;
 };
-main()
-  .then(() => {
-    console.log("Done!");
-    ResponseWriter.write();
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error(error);
-    ResponseWriter.write(error);
-    process.exit(1);
-  });
+main().then((errors) => {
+  console.log("Done!");
+  ResponseWriter.write(errors);
+  process.exit(0);
+});

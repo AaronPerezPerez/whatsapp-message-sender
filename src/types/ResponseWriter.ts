@@ -1,8 +1,13 @@
 import * as fs from "fs";
+import { DomainError } from "../errors/DomainError.js";
 
 export class ResponseWriter {
-  static write(error?: Error) {
-    // Write in the file response.txt the error.message
-    fs.writeFileSync("response.txt", error ? error.message : "OK");
+  static write(errors: DomainError[] = []) {
+    const response = errors.reduce(
+      (accumulated, error) =>
+        accumulated + `${error.messageId}:${error.message}\n`,
+      "",
+    );
+    fs.writeFileSync("response.txt", response);
   }
 }
