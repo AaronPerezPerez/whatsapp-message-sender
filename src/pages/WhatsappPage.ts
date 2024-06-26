@@ -37,9 +37,9 @@ export class WhatsappPage {
     const contactSearchSelector =
       'div[aria-label="Cuadro de texto para ingresar la búsqueda"]';
     await this.page.focus(contactSearchSelector);
-    await this.page.keyboard.down("Meta");
+    await this.page.keyboard.down("Control");
     await this.page.keyboard.press("A");
-    await this.page.keyboard.up("Meta");
+    await this.page.keyboard.up("Control");
     await this.page.keyboard.press("Backspace");
     await this.page.type(contactSearchSelector, contactNumber);
     await sleep(config.FIND_CONTACT_WAIT);
