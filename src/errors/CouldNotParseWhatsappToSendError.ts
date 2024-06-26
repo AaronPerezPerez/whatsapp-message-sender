@@ -4,7 +4,7 @@ export class CouldNotParseWhatsappToSendError extends DomainError {
   constructor(messageId: string) {
     super(
       messageId,
-      "Could not parse whatsappToSend.json file. Check if it is correctly formatted.",
+      "No se pudo parsear el whatsapp a enviar. Por favor, verifique que el formato sea correcto",
     );
   }
 }

@@ -2,6 +2,6 @@ import { DomainError } from "./DomainError.js";
 
 export class AlreadyLoggedInError extends DomainError {
   constructor(messageId: string) {
-    super(messageId, "Whatsapp web account already linked.");
+    super(messageId, "Ya hay una cuenta de Whatsapp web asociada");
   }
 }
