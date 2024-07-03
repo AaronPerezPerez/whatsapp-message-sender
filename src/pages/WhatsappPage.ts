@@ -42,7 +42,29 @@ export class WhatsappPage {
     await this.page.keyboard.up("Control");
     await this.page.keyboard.press("Backspace");
     await this.page.type(contactSearchSelector, contactNumber);
+
     await sleep(config.FIND_CONTACT_WAIT);
+
+    const spans = await this.page.$$("span");
+    const contactNotFoundMessage = await Promise.all(
+      spans.map(async (span) => {
+        const innerText = await span.getProperty("innerText");
+        return await innerText.jsonValue();
+      }),
+    ).then((texts) =>
+      texts.find((text) =>
+        text.includes("No se encontró ningún chat, contacto ni mensaje."),
+      ),
+    );
+
+    if (contactNotFoundMessage) {
+      await this.page.focus(contactSearchSelector);
+      await this.page.keyboard.down("Control");
+      await this.page.keyboard.press("A");
+      await this.page.keyboard.up("Control");
+      await this.page.keyboard.press("Backspace");
+      throw new ContactNotFound(contactNumber);
+    }
     await this.page.mouse.click(250, 250);
   }
 
