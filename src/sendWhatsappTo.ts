@@ -50,7 +50,7 @@ const main = async () => {
       if (!(await whatsappPage.isLoggedIn()))
         throw new NotLoggedInError(whatsappToSend.id);
 
-      await whatsappPage.goToChat(whatsappToSend.to);
+      await whatsappPage.goToChat(whatsappToSend);
       await whatsappPage.sendMessage(whatsappToSend);
 
       throw new WhatsappSentSuccessfullyError(whatsappToSend.id);

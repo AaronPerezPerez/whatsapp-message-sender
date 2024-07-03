@@ -33,7 +33,7 @@ export class WhatsappPage {
     await sleep(config.MEDIUM_WAIT);
   }
 
-  async goToChat(contactNumber: string) {
+  async goToChat(whatsappToSend: WhatsappToSend) {
     const contactSearchSelector =
       'div[aria-label="Cuadro de texto para ingresar la búsqueda"]';
     await this.page.focus(contactSearchSelector);
@@ -41,7 +41,7 @@ export class WhatsappPage {
     await this.page.keyboard.press("A");
     await this.page.keyboard.up("Control");
     await this.page.keyboard.press("Backspace");
-    await this.page.type(contactSearchSelector, contactNumber);
+    await this.page.type(contactSearchSelector, whatsappToSend.to);
 
     await sleep(config.FIND_CONTACT_WAIT);
 
@@ -63,7 +63,7 @@ export class WhatsappPage {
       await this.page.keyboard.press("A");
       await this.page.keyboard.up("Control");
       await this.page.keyboard.press("Backspace");
-      throw new ContactNotFound(contactNumber);
+      throw new ContactNotFound(whatsappToSend.id);
     }
     await this.page.mouse.click(250, 250);
   }
