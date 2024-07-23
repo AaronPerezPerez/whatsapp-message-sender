@@ -40,6 +40,8 @@ const main = async () => {
   await page.setUserAgent(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3641.0 Safari/537.36",
   );
+  await page.setViewport({ width: 1920, height: 1080});
+
 
   await page.goto("https://web.whatsapp.com/");
 
