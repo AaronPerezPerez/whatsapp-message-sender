@@ -11,6 +11,7 @@ export const createBrowser = async () => {
   dotenv.config({ path: path.join(__dirname, "../../.env") });
 
   return await puppeteer.launch({
+    defaultViewport: { width: 1920, height: 1080},
     headless: config.HEADLESS,
     userDataDir: "./profile",
     args: ["--lang=es-ES,es", "--start-maximized"],
