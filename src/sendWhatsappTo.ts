@@ -47,19 +47,18 @@ const main = async () => {
   await sleep(config.OPEN_WHATSAPP_WAIT);
   const errors: DomainError[] = [];
   for (const whatsappToSend of whatsappsToSend) {
-    const recorder = await page.screencast({path: `recording_${whatsappToSend.id}.webm`});
     try {
       if (!(await whatsappPage.isLoggedIn()))
         throw new NotLoggedInError(whatsappToSend.id);
-
+      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_1.png`)});
       await whatsappPage.goToChat(whatsappToSend);
+      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_2.png`)});
       await whatsappPage.sendMessage(whatsappToSend);
+      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_3.png`)});
 
       throw new WhatsappSentSuccessfullyError(whatsappToSend.id);
     } catch (e) {
       errors.push(e as DomainError);
-    } finally {
-      await recorder.stop();
     }
   }
 
