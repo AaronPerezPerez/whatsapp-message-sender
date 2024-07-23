@@ -43,9 +43,11 @@ const main = async () => {
 
   await page.goto("https://web.whatsapp.com/");
 
+
   await sleep(config.OPEN_WHATSAPP_WAIT);
   const errors: DomainError[] = [];
   for (const whatsappToSend of whatsappsToSend) {
+    const recorder = await page.screencast({path: `recording_${whatsappToSend.id}.webm`});
     try {
       if (!(await whatsappPage.isLoggedIn()))
         throw new NotLoggedInError(whatsappToSend.id);
@@ -56,6 +58,8 @@ const main = async () => {
       throw new WhatsappSentSuccessfullyError(whatsappToSend.id);
     } catch (e) {
       errors.push(e as DomainError);
+    } finally {
+      await recorder.stop();
     }
   }
 
