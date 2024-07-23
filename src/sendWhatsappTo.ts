@@ -53,11 +53,11 @@ const main = async () => {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = dirname(__filename);
 
-      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_1.png`)});
+      await page.screenshot({path: path.join(__dirname, "../screenshots", `${whatsappToSend.id}_1.png`)});
       await whatsappPage.goToChat(whatsappToSend);
-      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_2.png`)});
+      await page.screenshot({path: path.join(__dirname, "../screenshots", `${whatsappToSend.id}_2.png`)});
       await whatsappPage.sendMessage(whatsappToSend);
-      await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_3.png`)});
+      await page.screenshot({path: path.join(__dirname, "../screenshots", `${whatsappToSend.id}_3.png`)});
 
       throw new WhatsappSentSuccessfullyError(whatsappToSend.id);
     } catch (e) {
