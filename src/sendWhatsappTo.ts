@@ -50,6 +50,9 @@ const main = async () => {
     try {
       if (!(await whatsappPage.isLoggedIn()))
         throw new NotLoggedInError(whatsappToSend.id);
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
+
       await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_1.png`)});
       await whatsappPage.goToChat(whatsappToSend);
       await page.screenshot({path: path.join(__dirname, "screenshots", `${whatsappToSend.id}_2.png`)});
