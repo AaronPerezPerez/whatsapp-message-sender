@@ -17,7 +17,8 @@ export class WhatsappPage {
     const contactSearchSelector = await this.page.$(
       'div[aria-label="Buscar"]',
     );
-    return !Boolean(qrSelector) && Boolean(contactSearchSelector);
+    return !Boolean(qrSelector) && Boolean(contactSearchSelector)
+        ;
   }
 
   async sendMessage(whatsappToSend: WhatsappToSend) {
