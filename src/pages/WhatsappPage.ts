@@ -15,7 +15,7 @@ export class WhatsappPage {
   async isLoggedIn(): Promise<boolean> {
     const qrSelector = await this.page.$('canvas[aria-label="Scan me!"]');
     const contactSearchSelector = await this.page.$(
-      'div[aria-label="Cuadro de texto para ingresar la búsqueda"]',
+      'div[aria-label="Buscar"]',
     );
     return !Boolean(qrSelector) && Boolean(contactSearchSelector);
   }
@@ -35,7 +35,7 @@ export class WhatsappPage {
 
   async goToChat(whatsappToSend: WhatsappToSend) {
     const contactSearchSelector =
-      'div[aria-label="Cuadro de texto para ingresar la búsqueda"]';
+      'div[aria-label="Buscar"]';
     await this.page.focus(contactSearchSelector);
     await this.page.keyboard.down("Control");
     await this.page.keyboard.press("A");
