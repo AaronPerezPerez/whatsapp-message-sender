@@ -4,7 +4,6 @@ import { sleep } from "../utils/sleep.js";
 import { UnreachableWhatsappMainPage } from "../errors/UnreachableWhatsappMainPage.js";
 import { config } from "../utils/config.js";
 import { WhatsappToSend } from "../types/WhatsappToSend.js";
-import { log } from "node:console";
 
 export class WhatsappPage {
   private page: puppeteer.Page;
@@ -28,8 +27,8 @@ export class WhatsappPage {
   }
 
   async sendMessage(whatsappToSend: WhatsappToSend) {
-    const messageWriteInputSelector = 'div[aria-label="Escribe un mensaje"]';
-
+    const messageWriteInputSelector =
+      'div[aria-placeholder="Escribe un mensaje"]';
     await this.page
       .type(messageWriteInputSelector, whatsappToSend.message)
       .catch(() => {
@@ -44,9 +43,9 @@ export class WhatsappPage {
     const contactSearchSelector = 'div[aria-label=""]'; //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
     console.log("Focusing selector for contact search");
     await this.page.focus(contactSearchSelector);
-    await this.page.keyboard.down("Control");
+    await this.page.keyboard.down("Meta");
     await this.page.keyboard.press("A");
-    await this.page.keyboard.up("Control");
+    await this.page.keyboard.up("Meta");
     await this.page.keyboard.press("Backspace");
     console.log("Typing");
     await this.page.type(contactSearchSelector, whatsappToSend.to);
