@@ -4,6 +4,7 @@ import { sleep } from "../utils/sleep.js";
 import { UnreachableWhatsappMainPage } from "../errors/UnreachableWhatsappMainPage.js";
 import { config } from "../utils/config.js";
 import { WhatsappToSend } from "../types/WhatsappToSend.js";
+import { log } from "node:console";
 
 export class WhatsappPage {
   private page: puppeteer.Page;
@@ -14,11 +15,16 @@ export class WhatsappPage {
 
   async isLoggedIn(): Promise<boolean> {
     const qrSelector = await this.page.$('canvas[aria-label="Scan me!"]');
-    const contactSearchSelector = await this.page.$(
-      'div[aria-label="Buscar"]',
+    const contactSearchSelector = await this.page.$('div[aria-label=""]'); //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
+    console.log(
+      "Is logged in",
+      !Boolean(qrSelector) && Boolean(contactSearchSelector)
     );
-    return !Boolean(qrSelector) && Boolean(contactSearchSelector)
-        ;
+    const qrSelectorIsPresent = Boolean(qrSelector);
+    const contactSearchIsPresent = Boolean(contactSearchSelector);
+
+    console.log({ qrSelectorIsPresent, contactSearchIsPresent });
+    return !qrSelectorIsPresent && contactSearchIsPresent;
   }
 
   async sendMessage(whatsappToSend: WhatsappToSend) {
@@ -35,13 +41,14 @@ export class WhatsappPage {
   }
 
   async goToChat(whatsappToSend: WhatsappToSend) {
-    const contactSearchSelector =
-      'div[aria-label="Buscar"]';
+    const contactSearchSelector = 'div[aria-label=""]'; //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
+    console.log("Focusing selector for contact search");
     await this.page.focus(contactSearchSelector);
     await this.page.keyboard.down("Control");
     await this.page.keyboard.press("A");
     await this.page.keyboard.up("Control");
     await this.page.keyboard.press("Backspace");
+    console.log("Typing");
     await this.page.type(contactSearchSelector, whatsappToSend.to);
 
     await sleep(config.FIND_CONTACT_WAIT);
@@ -51,11 +58,11 @@ export class WhatsappPage {
       spans.map(async (span) => {
         const innerText = await span.getProperty("innerText");
         return await innerText.jsonValue();
-      }),
+      })
     ).then((texts) =>
       texts.find((text) =>
-        text.includes("No se encontró ningún chat, contacto ni mensaje."),
-      ),
+        text.includes("No se encontró ningún chat, contacto ni mensaje.")
+      )
     );
 
     if (contactNotFoundMessage) {
@@ -73,7 +80,7 @@ export class WhatsappPage {
     try {
       await this.page.waitForSelector(
         'div[aria-label="Cuadro de texto para ingresar la búsqueda"]',
-        { timeout: timeoutInMs },
+        { timeout: timeoutInMs }
       );
     } catch (e) {
       throw new UnreachableWhatsappMainPage("");

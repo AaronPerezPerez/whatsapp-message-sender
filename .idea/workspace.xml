@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8b267388-6f37-4051-82b9-eb96dc5e6878" name="Changes" comment="fix: set viewport">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/WhatsappPage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/WhatsappPage.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +146,7 @@
       <workItem from="1720021530028" duration="2917000" />
       <workItem from="1721750277950" duration="279000" />
       <workItem from="1721750564892" duration="4199000" />
-      <workItem from="1725441647204" duration="636000" />
+      <workItem from="1725441647204" duration="1373000" />
     </task>
     <task id="LOCAL-00001" summary="fix: doesn't send the message to the previous correct number when not finding the current message contact">
       <option name="closed" value="true" />
