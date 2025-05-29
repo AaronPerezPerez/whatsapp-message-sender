@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8b267388-6f37-4051-82b9-eb96dc5e6878" name="Changes" comment="fix: set viewport">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screenshots/123_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/screenshots/123_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/WhatsappPage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/WhatsappPage.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,9 +58,10 @@
     "Playwright.has title.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "js.last.introduce.type": "CONST",
-    "last_opened_file_path": "/Users/aaronperez/experiments/emesoft-local-whasapp/src",
+    "last_opened_file_path": "/Users/aaronperez/Unwork/whatsapp-message-sender/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
@@ -70,15 +73,15 @@
     "npm.start.executor": "Run",
     "prettierjs.PrettierConfiguration.Package": "/Users/aaronperez/experiments/emesoft-local-whasapp/node_modules/prettier",
     "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
-    "ts.external.directory.path": "/Users/aaronperez/experiments/emesoft-local-whasapp/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/aaronperez/Unwork/whatsapp-message-sender/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
-      <recent name="$PROJECT_DIR$/src/utils" />
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/src/utils" />
       <recent name="$PROJECT_DIR$/src/errors" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -130,6 +133,13 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.26053.12" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -147,6 +157,7 @@
       <workItem from="1721750277950" duration="279000" />
       <workItem from="1721750564892" duration="4199000" />
       <workItem from="1725441647204" duration="1373000" />
+      <workItem from="1748521603748" duration="1648000" />
     </task>
     <task id="LOCAL-00001" summary="fix: doesn't send the message to the previous correct number when not finding the current message contact">
       <option name="closed" value="true" />

@@ -14,7 +14,10 @@ export class WhatsappPage {
 
   async isLoggedIn(): Promise<boolean> {
     const qrSelector = await this.page.$('canvas[aria-label="Scan me!"]');
-    const contactSearchSelector = await this.page.$('button[aria-label="Busca un chat o inicia uno nuevo."]'); //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
+
+// await sleep(50_000)
+    const contactSearchSelector = await this.page.$('div[aria-label="Cuadro de texto para ingresar la búsqueda"]'); //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
+    if(!contactSearchSelector) console.log("Contact search selector not found, probably not logged in");
     console.log(
       "Is logged in",
       !Boolean(qrSelector) && Boolean(contactSearchSelector)
@@ -27,7 +30,7 @@ export class WhatsappPage {
   }
 
   async goToChat(whatsappToSend: WhatsappToSend) {
-    const contactSearchSelector = 'button[aria-label="Busca un chat o inicia uno nuevo."]'; //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
+    const contactSearchSelector = 'div[aria-label="Cuadro de texto para ingresar la búsqueda"]'; //TODO: Fix this, it's not a good selector as it should be aria-label="Buscar"
     console.log("Focusing selector for contact search");
     await this.page.click(contactSearchSelector);
 
