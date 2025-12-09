@@ -38,7 +38,7 @@ const main = async () => {
   const page = await browser.newPage();
   const whatsappPage = new WhatsappPage(page);
   await page.setUserAgent(
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3641.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   );
   await page.setViewport({ width: 1920, height: 1080});
 
