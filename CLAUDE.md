@@ -39,41 +39,44 @@ Ambos scripts ejecutan via `env-cmd tsx ...`, así que el `.env` de la raíz se 
 
 ## Arquitectura (de un vistazo)
 
+Ports & adapters ligero. Tres capas: `core/` (lógica pura testeable), `adapters/` (IO real con Puppeteer/FS) y `entrypoints/` (wiring).
+
 ```
 src/
-├── loginToWhatsappWeb.ts     # entrypoint: login
-├── sendWhatsappTo.ts         # entrypoint: envío en lote
-├── inspectDom.ts             # herramienta de debug (ver más abajo)
-├── pages/
-│   └── WhatsappPage.ts       # Page Object con selectores de WhatsApp Web
-├── types/
-│   ├── WhatsappToSend.ts     # Value object + primitives
-│   └── ResponseWriter.ts     # Escribe response.txt
-├── utils/
-│   ├── createBrowser.ts      # Lanza puppeteer con flags y userDataDir
-│   ├── config.ts             # Lee process.env con defaults
-│   ├── parseEmojis.ts        # Sustituye [code] → emoji
-│   ├── parseEmojis.spec.ts   # Test con vitest
+├── config.ts                           # lee process.env con defaults
+├── inspectDom.ts                       # herramienta de debug (ver más abajo)
+├── core/                               # lógica pura, sin IO. 100% testeable.
+│   ├── types.ts                        # WhatsappToSend, SendResult, Status, STATUS_MESSAGES, WhatsappGateway
+│   ├── sendBatch.ts                    # use case: (gateway, inputs) → SendResult[]
+│   ├── sendBatch.spec.ts               # tests con InMemoryWhatsappGateway
+│   ├── parseInput.ts                   # JSON raw → WhatsappToSend[]
+│   ├── parseInput.spec.ts
+│   ├── formatResults.ts                # SendResult[] → string para response.txt
+│   ├── formatResults.spec.ts
+│   ├── parseEmojis.ts                  # sustituye [code] → emoji
+│   ├── parseEmojis.spec.ts
 │   └── sleep.ts
-└── errors/                   # Errores de dominio (DomainError base)
-    ├── DomainError.ts
-    ├── WhatsappSentSuccessfullyError.ts   # ← ojo: usado como señal de éxito
-    ├── NotLoggedInError.ts
-    ├── ContactNotFound.ts
-    ├── AlreadyLoggedInError.ts
-    ├── CouldNotParseWhatsappToSendError.ts
-    └── UnreachableWhatsappMainPage.ts
+├── adapters/                           # IO real, no tiene tests unitarios
+│   ├── PuppeteerWhatsappGateway.ts     # implementa WhatsappGateway contra puppeteer.Page
+│   ├── browser.ts                      # launchBrowser + openWhatsappWeb
+│   └── fileIO.ts                       # readInputJson, writeResponseTxt, screenshotsDir
+└── entrypoints/
+    ├── sendWhatsappTo.ts               # wiring: parse → gateway → sendBatch → write
+    └── loginToWhatsappWeb.ts           # wiring: browser + espera a que escanees el QR
 ```
 
-Patrón: **Page Object** (`WhatsappPage`) encapsula los selectores; los entrypoints orquestan el flujo. Los errores de dominio heredan de `DomainError` y llevan siempre `messageId` + `message`, porque se serializan en `response.txt` para que el llamador externo pueda parsear el resultado.
+**Patrón**: el `core/` no conoce Puppeteer ni el filesystem; depende solo de la interfaz `WhatsappGateway` (`isLoggedIn`, `openChat`, `sendMessage`, `screenshot`). `PuppeteerWhatsappGateway` es el único adapter real. En tests se usa un `InMemoryWhatsappGateway` declarado inline en `sendBatch.spec.ts`.
+
+**Resultados** se modelan como discriminated union `{ id, status: "OK" | "CONTACT_NOT_FOUND" | "NOT_LOGGED_IN" }`. El mapa `STATUS_MESSAGES` (en `core/types.ts`) convierte el status al string literal que va a `response.txt` — esa tabla es la **API pública** del script, el consumidor externo parsea por string.
 
 ### Convenciones importantes
 
-- **Imports con extensión `.js`** aunque el fuente sea `.ts` (es ESM puro, `"type": "module"` en `package.json`).
-- **Archivos**: PascalCase para clases/errores (`WhatsappPage.ts`, `ContactNotFound.ts`), camelCase para entrypoints y utilidades (`sendWhatsappTo.ts`, `createBrowser.ts`).
-- **Selectores centralizados** en `WhatsappPage.ts` bajo la constante `SELECTORS`. Si tienes que tocar un selector, tócalo ahí.
+- **Imports con extensión `.js`** aunque el fuente sea `.ts` (ESM puro, `"type": "module"` en `package.json`).
+- **Archivos**: PascalCase para clases (`PuppeteerWhatsappGateway.ts`), camelCase para entrypoints, módulos del core y utilidades (`sendWhatsappTo.ts`, `sendBatch.ts`, `browser.ts`).
+- **Selectores centralizados** en `PuppeteerWhatsappGateway.ts` bajo la constante `SELECTORS`. Si tienes que tocar un selector, tócalo ahí.
 - **Ningún fetcher ni capa de repositorio**: estos scripts leen de un JSON y escriben a un `.txt`. Sin persistencia.
-- **Sin comentarios de relleno**: solo cuando expliquen el porqué. Los TODO existentes son contratos pendientes, no los borres sin arreglar el issue subyacente.
+- **Tests**: `npm test` corre vitest sobre `src/core/**/*.spec.ts`. Para lógica nueva, añade el test al core con `InMemoryWhatsappGateway` o fakes equivalentes. El adapter de Puppeteer no tiene tests unitarios.
+- **Sin comentarios de relleno**: solo cuando expliquen el porqué.
 
 ---
 
@@ -97,7 +100,7 @@ npm run sendWhatsapp
 cat response.txt
 ```
 
-### Variables de entorno (`src/utils/config.ts`)
+### Variables de entorno (`src/config.ts`)
 
 | Variable | Default | Para qué |
 |----------|---------|----------|
@@ -135,11 +138,11 @@ WhatsApp Web **cambia los selectores y la estructura del DOM cada pocas semanas*
 
 | Síntoma | Archivo / causa probable |
 |---------|--------------------------|
-| Dice "not logged in" aunque la sesión existe | `WhatsappPage.isLoggedIn` — revisa que `#pane-side` siga existiendo en el DOM actual (dumpear con `inspectDom.ts`). |
+| Dice "not logged in" aunque la sesión existe | `PuppeteerWhatsappGateway.isLoggedIn` — revisa que `#pane-side` siga existiendo en el DOM actual (dumpear con `inspectDom.ts`). |
 | Busca pero no filtra la lista; envía al contacto equivocado | React input: ver sección "React-controlled inputs" más abajo. |
-| `ContactNotFound` para números válidos | O bien `#main` tarda >10s (subir timeout) o bien `clickFirstSearchResult` está clickando un header de sección → añadir el texto al `RESULT_SECTION_HEADERS` de `WhatsappPage.ts`. |
+| `CONTACT_NOT_FOUND` para números válidos | O bien `#main` tarda >10s (subir timeout) o bien `clickFirstSearchResult` está clickando un header de sección → añadir el texto al `RESULT_SECTION_HEADERS` de `PuppeteerWhatsappGateway.ts`. |
 | Mensaje escrito pero nunca enviado | Selector `div[role="textbox"][data-tab="10"]` — dumpear el `#main` para ver si `data-tab` cambió. |
-| Login parece no aplicar UA | Ya arreglado: `setUserAgent` debe ir **antes** de `page.goto` en `loginToWhatsappWeb.ts`. |
+| Login parece no aplicar UA | Ya arreglado: `setUserAgent` va **antes** de `page.goto` en `adapters/browser.ts::openWhatsappWeb`. |
 
 ### React-controlled inputs (lección aprendida)
 
@@ -154,19 +157,21 @@ await page.evaluate((sel, val) => {
 }, selector, value);
 ```
 
-Esto ya está implementado en `WhatsappPage.setReactInputValue`. El `div[contenteditable="true"]` del input de mensaje (`data-tab="10"`) **NO** tiene este problema — es un contenteditable nativo y `page.type` funciona bien ahí.
+Esto ya está implementado en `PuppeteerWhatsappGateway.setReactInputValue`. El `div[contenteditable="true"]` del input de mensaje (`data-tab="10"`) **NO** tiene este problema — es un contenteditable nativo y `page.type` funciona bien ahí.
 
 ### Click en resultado de búsqueda
 
-`row.click()` desde `page.evaluate` **no abre** el chat (WhatsApp Web ignora clicks sintéticos de JS). Hay que usar `page.mouse.click(x, y)` con las coordenadas del row, que Puppeteer dispara como evento de ratón real vía CDP. Ver `WhatsappPage.clickFirstSearchResult`.
+`row.click()` desde `page.evaluate` **no abre** el chat (WhatsApp Web ignora clicks sintéticos de JS). Hay que usar `page.mouse.click(x, y)` con las coordenadas del row, que Puppeteer dispara como evento de ratón real vía CDP. Ver `PuppeteerWhatsappGateway.clickFirstSearchResult`.
 
 ---
 
 ## Tests
 
-- `vitest` instalado como devDep pero **no hay script `test`** en `package.json` (el actual hace `exit 1`).
-- Único spec: `src/utils/parseEmojis.spec.ts`.
-- No hay tests E2E porque requerirían una sesión real de WhatsApp Web. Para lógica pura (parsers, errores, value objects) sí escribir test con vitest.
+- `npm test` — corre vitest sobre `src/core/**/*.spec.ts` una vez.
+- `npm run test:watch` — modo watch.
+- `npm run typecheck` — `tsc --noEmit`.
+- El core (use case, parsers, formateadores) está cubierto con tests unitarios usando `InMemoryWhatsappGateway` en memoria, sin puppeteer.
+- `PuppeteerWhatsappGateway` no tiene tests unitarios — requeriría una sesión real de WhatsApp Web. Se valida manualmente con `npm run sendWhatsapp`.
 
 ---
 
@@ -180,4 +185,4 @@ Estilo observado en el historial: **Conventional Commits** cortos en inglés (`f
 
 ## TODOs vivos que arrastra el repo
 
-- `sendWhatsappTo.ts:34` — "This is terrible, fix this as soon as possible (use Either-like monad??)". Se refiere al flujo que usa `WhatsappSentSuccessfullyError` como señal de éxito lanzándolo dentro del `try`. Al refactorizar, sustituir por `Result<T, DomainError>` o similar y mantener la forma de `response.txt` igual (el consumidor externo parsea esa salida).
+- Ninguno pendiente tras el refactor a ports & adapters. El antiguo TODO de `sendWhatsappTo.ts` (usar `WhatsappSentSuccessfullyError` como señal de éxito) ya está resuelto con el discriminated union `SendResult`.

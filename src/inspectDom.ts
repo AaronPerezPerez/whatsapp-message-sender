@@ -1,6 +1,6 @@
-import { sleep } from "./utils/sleep.js";
-import { config } from "./utils/config.js";
-import { createBrowser } from "./utils/createBrowser.js";
+import { sleep } from "./core/sleep.js";
+import { config } from "./config.js";
+import { launchBrowser, openWhatsappWeb } from "./adapters/browser.js";
 
 const dumpDom = async (page: import("puppeteer").Page, label: string) => {
   const diag = await page.evaluate(`(() => {
@@ -40,19 +40,16 @@ const dumpDom = async (page: import("puppeteer").Page, label: string) => {
 };
 
 const main = async () => {
-  const browser = await createBrowser();
-  const page = await browser.newPage();
-  await page.setUserAgent(
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  );
-  await page.setViewport({ width: 1920, height: 1080 });
-  await page.goto("https://web.whatsapp.com/");
+  const browser = await launchBrowser();
+  const page = await openWhatsappWeb(browser);
   await page.waitForSelector("#pane-side", { timeout: 30_000 });
   await sleep(1_500);
 
   const searchSelector = 'input[role="textbox"][data-tab="3"]';
   await page.focus(searchSelector);
-  // React-aware value setter + dispatchEvent
+  // React-aware value setter + dispatchEvent.
+  // Mismo patrón que PuppeteerWhatsappGateway.setReactInputValue — si lo
+  // cambias ahí, revisa también aquí.
   await page.evaluate(
     `(() => {
       const input = document.querySelector('input[role="textbox"][data-tab="3"]');

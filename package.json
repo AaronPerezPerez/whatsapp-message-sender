@@ -4,9 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "sendWhatsapp": "env-cmd tsx src/sendWhatsappTo.ts",
-    "login": "env-cmd tsx src/loginToWhatsappWeb.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "sendWhatsapp": "env-cmd tsx src/entrypoints/sendWhatsappTo.ts",
+    "login": "env-cmd tsx src/entrypoints/loginToWhatsappWeb.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
