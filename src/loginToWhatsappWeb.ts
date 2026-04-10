@@ -11,10 +11,11 @@ const main = async () => {
   const browser = await createBrowser();
   const page = await browser.newPage();
   const whatsappPage = new WhatsappPage(page);
-  await page.goto("https://web.whatsapp.com/");
   await page.setUserAgent(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   );
+  await page.setViewport({ width: 1920, height: 1080 });
+  await page.goto("https://web.whatsapp.com/");
   await sleep(config.OPEN_WHATSAPP_WAIT);
 
   if (await whatsappPage.isLoggedIn()) throw new AlreadyLoggedInError("");
