@@ -19,7 +19,10 @@ export const parseInput = (raw: string): ParseInputResult => {
     if (!Array.isArray(json) || !json.every(isValidItem)) return { ok: false };
     return {
       ok: true,
-      inputs: json.map((item) => ({ ...item, message: parseEmojis(item.message) })),
+      inputs: json.map((item) => ({
+        ...item,
+        message: parseEmojis(item.message),
+      })),
     };
   } catch {
     return { ok: false };

@@ -83,9 +83,7 @@ describe("sendBatch", () => {
       { id: "1", status: "CONTACT_NOT_FOUND" },
       { id: "2", status: "OK" },
     ]);
-    expect(gateway.sentMessages).toEqual([
-      { to: "34600000002", text: "hola" },
-    ]);
+    expect(gateway.sentMessages).toEqual([{ to: "34600000002", text: "hola" }]);
   });
 
   it("does not take the _2 or _3 screenshot when the chat cannot be opened", async () => {
