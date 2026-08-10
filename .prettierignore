@@ -1,0 +1,11 @@
+node_modules
+package-lock.json
+
+# Artefactos de runtime (ver CLAUDE.md)
+profile
+screenshots
+dist
+response.txt
+src/whatsappToSend.json
+
+.idea
